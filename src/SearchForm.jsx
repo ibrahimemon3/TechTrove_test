@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import './index.css';
+import Table from "./Table";
 
 const SearchForm = ({ onSearch }) => {
   const [filters, setFilters] = useState({
@@ -108,34 +109,12 @@ const SearchForm = ({ onSearch }) => {
         </button>
         <button type="submit">Search</button>
       </form>
-      <h2>All People</h2>
-      {people.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Gender</th>
-              <th>Full Name</th>
-              <th>Age</th>
-              <th>Address</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {people.map((person, index) => (
-              <tr key={index}>
-                <td>{person.gender}</td>
-                <td>{person.fullName}</td>
-                <td>{person.personAge}</td>
-                <td>{person.location}</td>
-                <td>
-                  <button className="edit-button" onClick={() => handleEditPerson(index)}>Edit</button>
-                  <button className="delete-button" onClick={() => handleDeletePerson(index)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      
+      <Table
+        people={people}
+        handleEditPerson={handleEditPerson}
+        handleDeletePerson={handleDeletePerson}
+      />
     </div>
   );
 };

@@ -6,7 +6,7 @@ body {
   align-items: flex-start;
   height: 100vh;
   margin: 0;
-  padding-top: 50px; 
+  padding-top: 50px;
 }
 
 form {
@@ -103,7 +103,7 @@ th {
   width: 100px;
   height: 100px;
   background-image: url('./images/icon1.png');
-  /*background-image: url('./images/icon1.png');*/
+  /*background-image: url('./images/icon2.png');*/
   background-size: cover;
   background-position: center;
 }
