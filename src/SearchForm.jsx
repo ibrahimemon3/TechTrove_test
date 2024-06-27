@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import './index.css';
 
 const SearchForm = ({ onSearch }) => {
@@ -9,8 +9,15 @@ const SearchForm = ({ onSearch }) => {
     location: "",
   });
 
-  const [people, setPeople] = useState([]);
+  const [people, setPeople] = useState(() => {
+    const savedPeople = localStorage.getItem("people");
+    return savedPeople ? JSON.parse(savedPeople) : [];
+  });
   const [editIndex, setEditIndex] = useState(null);
+
+  useEffect(() => {
+    localStorage.setItem("people", JSON.stringify(people));
+  }, [people]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,7 +36,7 @@ const SearchForm = ({ onSearch }) => {
       setPeople(updatedPeople);
       setEditIndex(null);
     } else {
-      setPeople([...people, filters]);
+      setPeople([...people, { ...filters, id: people.length + 1 }]);
     }
     setFilters({
       gender: "",
