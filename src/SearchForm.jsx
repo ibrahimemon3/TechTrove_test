@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import './index.css';
 import Table from "./Table";
 
-const SearchForm = ({ onSearch }) => {
+const SearchForm = () => {
   const [filters, setFilters] = useState({
     gender: "",
     fullName: "",
@@ -15,6 +15,7 @@ const SearchForm = ({ onSearch }) => {
     return savedPeople ? JSON.parse(savedPeople) : [];
   });
   const [editIndex, setEditIndex] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     localStorage.setItem("people", JSON.stringify(people));
@@ -27,7 +28,14 @@ const SearchForm = ({ onSearch }) => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    onSearch(filters, people);
+    const results = people.filter(person => {
+      return Object.keys(filters).every(key => {
+        if (!filters[key]) return true;
+        if (key === "personAge") return person[key] === filters[key];
+        return person[key].toLowerCase().includes(filters[key].toLowerCase());
+      });
+    });
+    setSearchResults(results);
   };
 
   const handleAddPerson = () => {
@@ -115,6 +123,31 @@ const SearchForm = ({ onSearch }) => {
         handleEditPerson={handleEditPerson}
         handleDeletePerson={handleDeletePerson}
       />
+      {searchResults.length > 0 && (
+        <div>
+          <h2>Search Results</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Gender</th>
+                <th>Full Name</th>
+                <th>Age</th>
+                <th>Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {searchResults.map((person, index) => (
+                <tr key={index}>
+                  <td>{person.gender}</td>
+                  <td>{person.fullName}</td>
+                  <td>{person.personAge}</td>
+                  <td>{person.location}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
