@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import './index.css';
 import Table from "./Table";
 
 const SearchForm = () => {
@@ -28,8 +27,8 @@ const SearchForm = () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const results = people.filter(person => {
-      return Object.keys(filters).every(key => {
+    const results = people.filter((person) => {
+      return Object.keys(filters).every((key) => {
         if (!filters[key]) return true;
         if (key === "personAge") return person[key] === filters[key];
         return person[key].toLowerCase().includes(filters[key].toLowerCase());
@@ -67,26 +66,28 @@ const SearchForm = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleFormSubmit}>
-        <div className="gender-options">
-          <label>
+    <div className="flex flex-col items-center min-h-screen bg-white py-8">
+      <form onSubmit={handleFormSubmit} className="flex flex-col items-center gap-4 bg-aquamarine p-12 rounded-lg shadow-lg w-[40rem]">
+        <div className="flex gap-4 mb-4">
+          <label className="flex items-center">
             <input
               type="radio"
               name="gender"
               value="Female"
               checked={filters.gender === "Female"}
               onChange={handleInputChange}
+              className="mr-2"
             />
             Female
           </label>
-          <label>
+          <label className="flex items-center">
             <input
               type="radio"
               name="gender"
               value="Male"
               checked={filters.gender === "Male"}
               onChange={handleInputChange}
+              className="mr-2"
             />
             Male
           </label>
@@ -97,6 +98,7 @@ const SearchForm = () => {
           placeholder="Full Name"
           value={filters.fullName}
           onChange={handleInputChange}
+          className="w-72 mb-2 p-2 border border-gray-300 rounded-md"
         />
         <input
           type="number"
@@ -104,6 +106,7 @@ const SearchForm = () => {
           placeholder="Age"
           value={filters.personAge}
           onChange={handleInputChange}
+          className="w-72 mb-2 p-2 border border-gray-300 rounded-md"
         />
         <input
           type="text"
@@ -111,37 +114,44 @@ const SearchForm = () => {
           placeholder="Address"
           value={filters.location}
           onChange={handleInputChange}
+          className="w-72 mb-2 p-2 border border-gray-300 rounded-md"
         />
-        <button type="button" onClick={handleAddPerson}>
+        <button
+          type="button"
+          onClick={handleAddPerson}
+          className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-md mb-2"
+        >
           {editIndex !== null ? "Update Person" : "Add Person"}
         </button>
-        <button type="submit">Search</button>
+        <button type="submit" className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-md">
+          Search
+        </button>
       </form>
-      
+
       <Table
         people={people}
         handleEditPerson={handleEditPerson}
         handleDeletePerson={handleDeletePerson}
       />
       {searchResults.length > 0 && (
-        <div>
-          <h2>Search Results</h2>
-          <table>
+        <div className="mt-8 w-[40rem]">
+          <h2 className="text-xl font-bold mb-4">Search Results</h2>
+          <table className="w-full border-collapse bg-black text-left">
             <thead>
-              <tr>
-                <th>Gender</th>
-                <th>Full Name</th>
-                <th>Age</th>
-                <th>Address</th>
+              <tr className="bg-gray-800 text-white">
+                <th className="p-2">Gender</th>
+                <th className="p-2">Full Name</th>
+                <th className="p-2">Age</th>
+                <th className="p-2">Address</th>
               </tr>
             </thead>
             <tbody>
               {searchResults.map((person, index) => (
-                <tr key={index}>
-                  <td>{person.gender}</td>
-                  <td>{person.fullName}</td>
-                  <td>{person.personAge}</td>
-                  <td>{person.location}</td>
+                <tr key={index} className="bg-white border-b">
+                  <td className="p-2">{person.gender}</td>
+                  <td className="p-2">{person.fullName}</td>
+                  <td className="p-2">{person.personAge}</td>
+                  <td className="p-2">{person.location}</td>
                 </tr>
               ))}
             </tbody>
