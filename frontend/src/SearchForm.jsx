@@ -7,62 +7,124 @@ const SearchForm = () => {
     productName: "",
     price: "",
     brand: "",
+    image: null,
   });
 
-  const [products, setProducts] = useState(() => {
-    const savedProducts = localStorage.getItem("products");
-    return savedProducts ? JSON.parse(savedProducts) : [];
-  });
+  const [products, setProducts] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
-    localStorage.setItem("products", JSON.stringify(products));
-  }, [products]);
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/products", {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
   };
 
+  const handleImageChange = (e) => {
+    setFilters((prevFilters) => ({ ...prevFilters, image: e.target.files[0] }));
+  };
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
     const results = products.filter((product) => {
       return Object.keys(filters).every((key) => {
-        if (!filters[key]) return true;
-        if (key === "price") return product[key] === filters[key];
+        if (!filters[key] || key === "image") return true;
+        if (key === "price") return product[key] === Number(filters[key]);
         return product[key].toLowerCase().includes(filters[key].toLowerCase());
       });
     });
     setSearchResults(results);
   };
 
-  const handleAddProduct = () => {
-    if (editIndex !== null) {
-      const updatedProducts = [...products];
-      updatedProducts[editIndex] = filters;
-      setProducts(updatedProducts);
-      setEditIndex(null);
-    } else {
-      setProducts([...products, { ...filters, id: products.length + 1 }]);
+  const handleAddProduct = async () => {
+    const formData = new FormData();
+    formData.append("category", filters.category);
+    formData.append("productName", filters.productName);
+    formData.append("price", filters.price);
+    formData.append("brand", filters.brand);
+    if (filters.image) {
+      formData.append("image", filters.image);
     }
-    setFilters({
-      category: "",
-      productName: "",
-      price: "",
-      brand: "",
-    });
+
+    const endpoint = editIndex !== null
+      ? `http://localhost:8080/products/update/${products[editIndex]._id}`
+      : "http://localhost:8080/products/add";
+
+    const method = editIndex !== null ? "PUT" : "POST";
+
+    try {
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchProducts();
+        setFilters({
+          category: "",
+          productName: "",
+          price: "",
+          brand: "",
+          image: null,
+        });
+        setEditIndex(null);
+      } else {
+        console.error("Error adding/updating product:", data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const handleEditProduct = (index) => {
     const productToEdit = products[index];
-    setFilters(productToEdit);
+    setFilters({
+      category: productToEdit.category,
+      productName: productToEdit.productName,
+      price: productToEdit.price,
+      brand: productToEdit.brand,
+      image: null, // Set this to null because we can't pre-fill the file input
+    });
     setEditIndex(index);
   };
 
-  const handleDeleteProduct = (index) => {
-    const updatedProducts = products.filter((_, i) => i !== index);
-    setProducts(updatedProducts);
+  const handleDeleteProduct = async (index) => {
+    try {
+      const response = await fetch(`http://localhost:8080/products/delete/${products[index]._id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchProducts();
+      } else {
+        console.error("Error deleting product:", data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -147,6 +209,11 @@ const SearchForm = () => {
           placeholder="Brand"
           value={filters.brand}
           onChange={handleInputChange}
+          className="w-72 mb-2 p-2 border border-gray-300 rounded-md"
+        />
+        <input
+          type="file"
+          onChange={handleImageChange}
           className="w-72 mb-2 p-2 border border-gray-300 rounded-md"
         />
         <button

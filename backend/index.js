@@ -17,6 +17,8 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use('/auth',AuthRouter);
 app.use('/products',ProductRouter);
+app.use('/uploads', express.static('uploads'));
+
 
 app.listen(PORT,()=>{
     console.log(`Server is running on ${PORT}`)
