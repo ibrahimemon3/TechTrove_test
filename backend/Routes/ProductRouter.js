@@ -1,20 +1,18 @@
-const ensureAuthenticated = require('../Middlewares/Auth');
+const express = require('express');
+const { ensureAuthenticated } = require('../Middlewares/Auth');
+const {
+  createProduct,
+  getAllProducts,
+  updateProduct,
+  deleteProduct,
+  upload,
+} = require('../Controllers/ProductController');
 
+const router = express.Router();
 
-const router = require('express').Router();
-
-router.get('/', ensureAuthenticated, (req, res) => {
-    console.log('---- logged in user detail ---', req.user);
-    res.status(200).json([
-        {
-            name: "mobile",
-            price: 10000
-        },
-        {
-            name: "tv",
-            price: 20000
-        }
-    ])
-});
+router.post('/add', ensureAuthenticated, upload.single('image'), createProduct);
+router.get('/', ensureAuthenticated, getAllProducts);
+router.put('/update/:id', ensureAuthenticated, upload.single('image'), updateProduct);
+router.delete('/delete/:id', ensureAuthenticated, deleteProduct);
 
 module.exports = router;
